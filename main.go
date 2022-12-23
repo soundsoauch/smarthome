@@ -21,14 +21,14 @@ func main() {
 	var inet, _ = net.InterfaceByName("eth0")
 	var client, _ = wol.NewRawClient(inet)
 	var target, _ = net.ParseMAC("A8:A1:59:19:0E:A4")
-	var shutdownCmd = exec.Command("ssh", "shutdown@iris", "sudo systemctl poweroff")
 
 	r.GET("/startup", func(c *gin.Context) {
 		c.JSON(http.StatusOK, client.Wake(target))
 	})
 
 	r.GET("/shutdown", func(c *gin.Context) {
-		c.JSON(http.StatusOK, shutdownCmd.Run())
+		var shutdownCmd = exec.Command("ssh", "shutdown@iris", "sudo systemctl poweroff")
+		c.JSON(http.StatusOK, shutdownCmd.Start())
 	})
 
 	r.GET("/status", func(c *gin.Context) {
