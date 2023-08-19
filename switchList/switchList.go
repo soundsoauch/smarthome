@@ -15,6 +15,7 @@ func New() *Switchlist {
 			switches.New("Dimmer"),
 			switches.New("BedroomLeft"),
 			switches.New("BedroomRight"),
+			switches.New("Kitchen"),
 		},
 	}
 }

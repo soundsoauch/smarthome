@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../public/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "jsx": "react",
+    "allowJs": true,
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "lib": ["ESNext", "dom"]
+  },
+  "include": ["./**/*.tsx"],
+  "exclude": ["node_modules/**/*"]
+}
