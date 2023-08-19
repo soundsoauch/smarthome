@@ -76,7 +76,7 @@ func (s *Switch) GetState(ch chan<- *Switch) {
 func (s *Switch) mapResults(body *SwitchDto) {
 	if body.StatusSNS.Energy != nil {
 		s.Energy = &SwitchEnergy{
-			Total:     body.StatusSNS.Energy.Today,
+			Total:     body.StatusSNS.Energy.Total,
 			Yesterday: body.StatusSNS.Energy.Yesterday,
 			Today:     body.StatusSNS.Energy.Today,
 			Power:     body.StatusSNS.Energy.Power,
