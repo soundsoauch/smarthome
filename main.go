@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"os/exec"
-	"sample-app/dataManager"
+	"smarthome/auth"
+	"smarthome/deviceList"
+	switchlist "smarthome/switchList"
 	"time"
 
 	"github.com/gin-contrib/static"
@@ -15,12 +16,44 @@ import (
 	"github.com/mdlayher/wol"
 )
 
+func Authenticator() gin.HandlerFunc {
+	var session *auth.Session = auth.New("http://fritz.box", "smarthome", "smartTestHome1")
+
+	return func(c *gin.Context) {
+		var sid, err = session.GetSID()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		c.Set("sid", sid)
+		c.Next()
+	}
+}
+
 func main() {
-	var r *gin.Engine = gin.Default()
-	var dataManager dataManager.DataManager = dataManager.New()
-	var inet, _ = net.InterfaceByName("eth0")
-	var client, _ = wol.NewRawClient(inet)
-	var target, _ = net.ParseMAC("A8:A1:59:19:0E:A4")
+	var r *gin.Engine = gin.New()
+
+	var inet, netErr = net.InterfaceByName("eth0")
+	if netErr != nil {
+		fmt.Println(netErr)
+		return
+	}
+
+	var client, wolErr = wol.NewRawClient(inet)
+	if wolErr != nil {
+		fmt.Println(wolErr)
+		return
+	}
+
+	var target, macErr = net.ParseMAC("A8:A1:59:19:0E:A4")
+	if macErr != nil {
+		fmt.Println(macErr)
+		return
+	}
+
+	var switches *switchlist.Switchlist = switchlist.New()
 
 	r.GET("/startup", func(c *gin.Context) {
 		c.JSON(http.StatusOK, client.Wake(target))
@@ -69,32 +102,30 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"isRunning": available})
 	})
 
-	// TODO Get user value
-	r.GET("/rooms/:roomName", func(c *gin.Context) {
-		var roomName string = c.Params.ByName("roomName")
-		var temperature string = dataManager.GetValueOf(roomName)
+	r.GET("/devices", Authenticator(), func(c *gin.Context) {
+		var sid string = c.MustGet("sid").(string)
+		var devices, err = deviceList.GetDeviceList(sid)
 
-		c.JSON(http.StatusOK, gin.H{"roomName": roomName, "temperature": temperature})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, devices)
 	})
 
-	r.Any("/heating-control/*proxyPath", ReverseProxy())
+	r.GET("/switches", func(c *gin.Context) {
+		var switches, err = switches.GetSwitchList()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, switches)
+	})
 
 	r.Use(static.Serve("/", static.LocalFile("./public", false)))
 
 	r.Run(":8000")
-}
-
-func ReverseProxy() gin.HandlerFunc {
-
-	target := "iris:80"
-
-	return func(c *gin.Context) {
-		director := func(req *http.Request) {
-			req.URL.Scheme = "http"
-			req.URL.Host = target
-			req.URL.Path = c.Param("proxyPath")
-		}
-		proxy := &httputil.ReverseProxy{Director: director}
-		proxy.ServeHTTP(c.Writer, c.Request)
-	}
 }
