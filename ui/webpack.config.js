@@ -17,8 +17,7 @@ module.exports = {
       },
     },
     proxy: {
-      "/devices": "http://hypnos:8000",
-      "/switches": "http://hypnos:8000",
+      "/devices": "http://localhost:8000",
     },
   },
   module: {

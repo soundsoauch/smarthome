@@ -3,54 +3,42 @@ import { useState, useEffect } from "react";
 
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
-import Card from "react-bootstrap/Card";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 import "./app.scss";
+import { Tile } from "./tile/tile";
+import { Device, DeviceType } from "./interfaces/device.interface";
 
-export function App() {
+export default function App() {
   const [devices, setDevices] = useState([]);
-  const [switches, setSwitches] = useState([]);
 
   useEffect(() => {
     fetch("/devices")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setDevices(data);
-      })
+      .then((res: Response) => res.json())
+      .then((devices: Device[]) =>
+        devices.filter((device: Device) => device.type !== DeviceType.BUTTON)
+      )
+      .then((devices: Device[]) => setDevices(devices))
       .catch((err) => {
-        console.log(err.message);
-      });
-  }, []);
-  useEffect(() => {
-    fetch("/switches")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setSwitches(data);
-      })
-      .catch((err) => {
-        console.log(err.message);
+        console.error(err.message);
       });
   }, []);
 
   return (
     <>
-      <Navbar className="bg-body-tertiary">
+      <Navbar sticky="top" className="bg-body-tertiary">
         <Container>
           <Navbar.Brand href="#home">Smarthome</Navbar.Brand>
         </Container>
       </Navbar>
-      <Card>
-        <Card.Body>
-          <pre>{JSON.stringify(devices, null, 2)}</pre>
-        </Card.Body>
-      </Card>
-      <Card>
-        <Card.Body>
-          <pre>{JSON.stringify(switches, null, 2)}</pre>
-        </Card.Body>
-      </Card>
+      <ul className="devices-container">
+        {devices.map((device: Device) => (
+          <li key={device.id}>
+            <Tile device={device} />
+          </li>
+        ))}
+      </ul>
     </>
   );
 }

@@ -1,1 +1,32 @@
 @import "~bootstrap/scss/bootstrap";
+
+html {
+  height: 100%;
+}
+
+body {
+  --bs-body-font-size: 10px;
+  --bs-border-radius: 0;
+
+  height: 100%;
+}
+
+ul {
+  display: grid;
+  grid-template-columns: repeat(3, calc(100% / 3));
+  grid-template-rows: repeat(7, calc(100% / 7));
+  padding: 2px;
+  flex-grow: 1;
+  margin: 0;
+  list-style: none;
+
+  li {
+    margin: 2px;
+  }
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

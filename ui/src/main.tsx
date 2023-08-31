@@ -1,11 +1,13 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot, Root } from "react-dom/client";
 
-import { App } from "./app";
+import App from "./app";
 
 class RootComponent extends HTMLElement {
+  private _root: Root = createRoot(this);
+
   connectedCallback() {
-    ReactDOM.render(<App />, this);
+    this._root.render(<App />);
   }
 }
 
