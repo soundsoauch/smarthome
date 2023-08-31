@@ -22,6 +22,11 @@ export interface Energy {
   power: number;
 }
 
+export interface StateDto {
+  tSoll?: number;
+  alert?: AlertState;
+}
+
 export enum DeviceType {
   THERMOSTAT = "THERMOSTAT",
   SENSOR = "SENSOR",

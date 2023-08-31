@@ -3,27 +3,14 @@ import { useState, useEffect } from "react";
 
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 
 import "./app.scss";
 import { Tile } from "./tile/tile";
 import { Device, DeviceType } from "./interfaces/device.interface";
+import { GetDevices } from "./hooks/data";
 
 export default function App() {
-  const [devices, setDevices] = useState([]);
-
-  useEffect(() => {
-    fetch("/devices")
-      .then((res: Response) => res.json())
-      .then((devices: Device[]) =>
-        devices.filter((device: Device) => device.type !== DeviceType.BUTTON)
-      )
-      .then((devices: Device[]) => setDevices(devices))
-      .catch((err) => {
-        console.error(err.message);
-      });
-  }, []);
+  const devices: Device[] = GetDevices();
 
   return (
     <>
