@@ -9,21 +9,24 @@ type Props = {
 
 export const Thermometer: React.FC<Props> = (props: Props) => {
   return (
-    <div className="tile-body">
-      <div>
-        {props.device.state.temperature / 10}
-        <div className="title-unit">
-          <em>°C</em>
-          <ThermometerHalf />
+    <section className="tile tile-type-thermometer">
+      <h2>{props.device.name}</h2>
+      <div className="tile-body">
+        <div>
+          {props.device.state.temperature / 10}
+          <div className="title-unit">
+            <em>°C</em>
+            <ThermometerHalf />
+          </div>
+        </div>
+        <div>
+          {props.device.state.humidity}
+          <div className="title-unit">
+            <em>%</em>
+            <Water />
+          </div>
         </div>
       </div>
-      <div>
-        {props.device.state.humidity}
-        <div className="title-unit">
-          <em>%</em>
-          <Water />
-        </div>
-      </div>
-    </div>
+    </section>
   );
 };

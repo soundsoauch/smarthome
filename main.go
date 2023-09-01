@@ -1,19 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"net"
+	"io/ioutil"
 	"net/http"
 	"os/exec"
 	"smarthome/auth"
-	"smarthome/deviceList"
-	switchlist "smarthome/switchList"
+	"smarthome/interfaces"
+	"smarthome/repository"
 	"time"
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/go-ping/ping"
-	"github.com/mdlayher/wol"
 )
 
 func Authenticator() gin.HandlerFunc {
@@ -23,7 +23,7 @@ func Authenticator() gin.HandlerFunc {
 		var sid, err = session.GetSID()
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
+			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -34,7 +34,7 @@ func Authenticator() gin.HandlerFunc {
 
 func main() {
 	var r *gin.Engine = gin.New()
-
+/*
 	var inet, netErr = net.InterfaceByName("eth0")
 	if netErr != nil {
 		fmt.Println(netErr)
@@ -51,12 +51,12 @@ func main() {
 	if macErr != nil {
 		fmt.Println(macErr)
 		return
-	}
+	}*/
 
-	var switches *switchlist.Switchlist = switchlist.New()
+	var deviceRepository *repository.Repository = repository.NewRepository()
 
 	r.GET("/startup", func(c *gin.Context) {
-		c.JSON(http.StatusOK, client.Wake(target))
+	//	c.JSON(http.StatusOK, client.Wake(target))
 	})
 
 	r.GET("/shutdown", func(c *gin.Context) {
@@ -104,25 +104,41 @@ func main() {
 
 	r.GET("/devices", Authenticator(), func(c *gin.Context) {
 		var sid string = c.MustGet("sid").(string)
-		var devices, err = deviceList.GetDeviceList(sid)
+		var devices, err = deviceRepository.GetDevices(sid)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
+			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		c.JSON(http.StatusOK, devices)
 	})
 
-	r.GET("/switches", func(c *gin.Context) {
-		var switches, err = switches.GetSwitchList()
+	r.PATCH("/devices", Authenticator(), func(c *gin.Context) {
+		var sid string = c.MustGet("sid").(string)
+		var id string = c.Query("id")
+		var deviceType string = c.Query("type")
 
+		data, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
+			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		c.JSON(http.StatusOK, switches)
+		var deviceState *interfaces.DeviceStateDto
+		err = json.Unmarshal([]byte(data), &deviceState)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		err = deviceRepository.SetDevice(sid, id, deviceType, deviceState)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		c.Status(http.StatusOK)
 	})
 
 	r.Use(static.Serve("/", static.LocalFile("./public", false)))

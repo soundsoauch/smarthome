@@ -27,12 +27,5 @@ export const Tile: React.FC<Props> = (props: Props) => {
     return <></>;
   };
 
-  const classNames: string[] = ["tile", "tile-type-" + props.device.type];
-
-  return (
-    <section className={classNames.join(" ")}>
-      <h2>{props.device.name}</h2>
-      {template(props.device)}
-    </section>
-  );
+  return template(props.device);
 };

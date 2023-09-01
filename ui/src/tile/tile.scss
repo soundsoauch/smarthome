@@ -40,9 +40,7 @@
     }
   }
 
-  &.tile-type-SENSOR {
-    svg {
-      font-size: 1.8rem;
-    }
+  &.tile-state-ON {
+    background-color: #fbe7c6;
   }
 }

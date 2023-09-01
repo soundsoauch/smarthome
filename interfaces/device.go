@@ -36,6 +36,11 @@ type DeviceState struct {
 	Energy        *Energy `json:"energy,omitempty"`
 }
 
+type DeviceStateDto struct {
+	TSoll         *int   `json:"tSoll,omitempty"`
+	Alert         *AlertState `json:"alert,omitempty"`
+}
+
 type Energy struct {
 	Total     float32 `json:"Total"`
 	Yesterday float32 `json:"Yesterday"`

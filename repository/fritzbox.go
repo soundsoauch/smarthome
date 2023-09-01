@@ -61,7 +61,7 @@ func FilterFritzDevices(devices []interfaces.FritzDeviceDTO) []*interfaces.Fritz
 		if isAVMMeasure || isAVMThermostat || isHANFUN {
 			filtered = append(filtered, &devices[i])
 		}
-		if isAVMButton && !isAVMThermostat {
+		if isAVMButton && !isAVMMeasure {
 			filtered = append(filtered, &devices[i])
 		}
 	}
