@@ -1,14 +1,11 @@
-@import "~bootstrap/scss/bootstrap";
-
 html {
   height: 100%;
 }
 
 body {
-  --bs-body-font-size: 10px;
-  --bs-border-radius: 0;
-
+  margin: 0;
   height: 100%;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 * {

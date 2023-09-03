@@ -2,18 +2,18 @@ package repository
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"smarthome/devices"
 	"smarthome/interfaces"
+	"strconv"
+	"strings"
 )
 
 func GetFritzDevices(sid string) ([]*interfaces.Device, error) {
 	resp, err := http.Get("http://fritz.box/webservices/homeautoswitch.lua?sid=" + sid + "&switchcmd=getdevicelistinfos")
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -39,6 +39,28 @@ func GetFritzDevices(sid string) ([]*interfaces.Device, error) {
 	}
 
 	return result, nil
+}
+
+func SetFritzState(sid string, id string, deviceState *interfaces.DeviceStateDto) error {
+	var tSoll string = getTSoll(deviceState.TSoll)
+	var ain string = strings.ReplaceAll(id, " ", "%20")
+	resp, err := http.Get("http://fritz.box/webservices/homeautoswitch.lua?sid=" + sid + "&ain=" + ain + "&switchcmd=sethkrtsoll&param=" + tSoll)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func getTSoll(tSoll *int) string {
+	if *tSoll >= 80 && *tSoll <= 280 {
+		return strconv.Itoa(*tSoll / 10 * 2)
+	}
+
+	return "253"; // off
 }
 
 func FilterFritzDevices(devices []interfaces.FritzDeviceDTO) []*interfaces.FritzDeviceDTO {

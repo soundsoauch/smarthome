@@ -39,9 +39,7 @@ func(r *Repository) GetDevices(sid string) ([]*interfaces.Device, error) {
 func(r *Repository) SetDevice(sid string, id string, deviceType string, deviceState *interfaces.DeviceStateDto) error {
 	if (deviceType == string(interfaces.PLUG)) {
 		return SetTasmotaState(id, deviceState)
-	} else {
-		// delegate fritzbox
 	}
 
-	return nil
+	return SetFritzState(sid, id, deviceState)
 }

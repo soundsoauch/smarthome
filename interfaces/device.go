@@ -32,6 +32,11 @@ type DeviceState struct {
 	Humidity      *int   `json:"humidity,omitempty"`
 	Temperature   *int   `json:"temperature,omitempty"`
 	TSoll         *int   `json:"tSoll,omitempty"`
+	Absenk        *int   `json:"absenk,omitempty"`
+	Komfort       *int   `json:"komfort,omitempty"`
+	HolidayActive *bool  `json:"holidayActive,omitempty"`
+	Error         *bool  `json:"error,omitempty"`
+	SummerActive  *bool  `json:"summerActive,omitempty"`
 	Alert         *AlertState `json:"alert,omitempty"`
 	Energy        *Energy `json:"energy,omitempty"`
 }

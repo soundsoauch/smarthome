@@ -17,7 +17,12 @@ type FritzDeviceDTO struct {
 }
 
 type FritzHKRDTO struct {
-	TSoll int `xml:"tsoll"`
+	TSoll          int   `xml:"tsoll"`
+	Absenk         int   `xml:"absenk"`
+	Komfort        int   `xml:"komfort"`
+	HolidayActive  bool  `xml:"holidayactive"`
+	Error          int   `xml:"errorcode"`
+	SummerActive   bool  `xml:"summeractive"`
 }
 
 type FritzHumidityDTO struct {

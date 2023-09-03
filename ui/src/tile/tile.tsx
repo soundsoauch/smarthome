@@ -10,6 +10,7 @@ import { Sensor } from "./sensor";
 
 type Props = {
   device: Device;
+  onOpenModal: (device: Device) => void;
 };
 
 export const Tile: React.FC<Props> = (props: Props) => {
@@ -20,7 +21,7 @@ export const Tile: React.FC<Props> = (props: Props) => {
       case DeviceType.SENSOR:
         return <Sensor device={device} />;
       case DeviceType.THERMOSTAT:
-        return <Thermostat device={device} />;
+        return <Thermostat device={device} onOpenModal={props.onOpenModal} />;
       case DeviceType.PLUG:
         return <Plug device={device} />;
     }

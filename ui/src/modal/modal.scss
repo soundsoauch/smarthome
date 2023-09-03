@@ -1,0 +1,43 @@
+$modalHeight: 400px;
+
+.modal {
+  display: block;
+  position: absolute;
+  top: calc(50% - $modalHeight/2);
+  left: 10%;
+  right: 10%;
+  height: $modalHeight;
+  padding: 8px;
+  background-color: #ffffff;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px;
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 300;
+  }
+
+  form {
+    > div {
+      display: flex;
+    }
+
+    label {
+      width: 30%;
+      font-weight: normal;
+      font-size: 0.8rem;
+    }
+
+    #tSoll {
+      flex-grow: 1;
+    }
+  }
+}
+
+.modal-stage {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: #fafafa;
+  opacity: 0.5;
+}

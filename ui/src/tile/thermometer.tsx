@@ -15,15 +15,14 @@ export const Thermometer: React.FC<Props> = (props: Props) => {
         <div>
           {props.device.state.temperature / 10}
           <div className="title-unit">
-            <em>°C</em>
-            <ThermometerHalf />
+            <em>°C</em>T
           </div>
         </div>
         <div>
           {props.device.state.humidity}
           <div className="title-unit">
             <em>%</em>
-            <Water />
+            RH
           </div>
         </div>
       </div>

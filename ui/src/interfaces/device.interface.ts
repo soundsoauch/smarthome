@@ -11,6 +11,11 @@ export interface State {
   humidity?: number;
   temperature?: number;
   tSoll?: number;
+  absenk?: number;
+  komfort?: number;
+  holidayActive?: boolean;
+  summerActive?: boolean;
+  error?: boolean;
   alert?: AlertState;
   energy?: Energy;
 }
