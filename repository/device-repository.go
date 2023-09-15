@@ -6,20 +6,29 @@ import (
 )
 
 type Repository struct {
-	tasmotaDeviceHostnames []string
+	tasmotaDeviceConfigs []TasmotaDeviceConfig
 }
 
-func NewRepository() *Repository {
-	return &Repository{
-		tasmotaDeviceHostnames: []string{
-			"Deko", "camera", "camera-furbo", "Dimmer", "BedroomLeft", "BedroomRight", "Kitchen",
-		},
+type TasmotaDeviceConfig struct {
+	hostName string
+	deviceType interfaces.Type
+}
+
+func NewRepository(config *interfaces.Config) *Repository {
+	var tasmotaDeviceConfigs []TasmotaDeviceConfig
+	for _, deviceConfig := range config.TasmotaDevices {
+		tasmotaDeviceConfigs = append(tasmotaDeviceConfigs, TasmotaDeviceConfig{
+			hostName: deviceConfig.Host,
+			deviceType: deviceConfig.Type,
+		})
 	}
+
+	return &Repository{tasmotaDeviceConfigs: tasmotaDeviceConfigs}
 }
 
 func(r *Repository) GetDevices(sid string) ([]*interfaces.Device, error) {
 	fritzDevices, fritzErr := GetFritzDevices(sid)
-	tasmotaDevices, tasmotaErr := GetTasmotaDevices(r.tasmotaDeviceHostnames)
+	tasmotaDevices, tasmotaErr := GetTasmotaDevices(r.tasmotaDeviceConfigs)
 	
 	if fritzErr != nil || tasmotaErr  != nil{
 		return nil, errors.New(fritzErr.Error() + ", " + tasmotaErr.Error())
@@ -37,7 +46,7 @@ func(r *Repository) GetDevices(sid string) ([]*interfaces.Device, error) {
 }
 
 func(r *Repository) SetDevice(sid string, id string, deviceType string, deviceState *interfaces.DeviceStateDto) error {
-	if (deviceType == string(interfaces.PLUG)) {
+	if (deviceType == string(interfaces.PLUG) || deviceType == string(interfaces.CAMERA)) {
 		return SetTasmotaState(id, deviceState)
 	}
 

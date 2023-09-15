@@ -8,6 +8,7 @@ const (
 	THERMOMETER        Type = "THERMOMETER"
 	BUTTON 			   Type = "BUTTON"
 	PLUG               Type = "PLUG"
+	CAMERA			   Type = "CAMERA"
 	UNKNOWN            Type = "UNKNOWN"
 )
 
@@ -21,6 +22,7 @@ const (
 
 type Device struct {
 	Name          string `json:"name"`
+	IP			  string `json:"ip,omitempty"`
 	ID            string `json:"id"`
 	IsConnected   bool   `json:"isConnected"`
 	HasLowBattery *bool  `json:"batterylow,omitempty"`

@@ -14,26 +14,22 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/go-ping/ping"
+	"gopkg.in/yaml.v2"
 )
-
-func Authenticator() gin.HandlerFunc {
-	var session *auth.Session = auth.New("http://fritz.box", "smarthome", "smartTestHome1")
-
-	return func(c *gin.Context) {
-		var sid, err = session.GetSID()
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		c.Set("sid", sid)
-		c.Next()
-	}
-}
 
 func main() {
 	var r *gin.Engine = gin.New()
+	yamlFile, err := ioutil.ReadFile("config.yaml")
+    if err != nil {
+        fmt.Printf("Config YAML err: %v ", err)
+		return
+    }
+	var config *interfaces.Config
+    err = yaml.Unmarshal(yamlFile, &config)
+    if err != nil {
+        fmt.Printf("Config YAML err: %v ", err)
+		return
+    }
 /*
 	var inet, netErr = net.InterfaceByName("eth0")
 	if netErr != nil {
@@ -53,7 +49,7 @@ func main() {
 		return
 	}*/
 
-	var deviceRepository *repository.Repository = repository.NewRepository()
+	var deviceRepository *repository.Repository = repository.NewRepository(config)
 
 	r.GET("/startup", func(c *gin.Context) {
 	//	c.JSON(http.StatusOK, client.Wake(target))
@@ -102,7 +98,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"isRunning": available})
 	})
 
-	r.GET("/devices", Authenticator(), func(c *gin.Context) {
+	r.GET("/devices", auth.Authenticator(config), func(c *gin.Context) {
 		var sid string = c.MustGet("sid").(string)
 		var devices, err = deviceRepository.GetDevices(sid)
 
@@ -114,7 +110,7 @@ func main() {
 		c.JSON(http.StatusOK, devices)
 	})
 
-	r.PATCH("/devices", Authenticator(), func(c *gin.Context) {
+	r.PATCH("/devices", auth.Authenticator(config), func(c *gin.Context) {
 		var sid string = c.MustGet("sid").(string)
 		var id string = c.Query("id")
 		var deviceType string = c.Query("type")

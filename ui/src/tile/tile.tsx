@@ -7,6 +7,7 @@ import { Device, DeviceType } from "../interfaces/device.interface";
 import { Thermostat } from "./thermostat";
 import { Thermometer } from "./thermometer";
 import { Sensor } from "./sensor";
+import { Camera } from "./camera";
 
 type Props = {
   device: Device;
@@ -24,6 +25,8 @@ export const Tile: React.FC<Props> = (props: Props) => {
         return <Thermostat device={device} onOpenModal={props.onOpenModal} />;
       case DeviceType.PLUG:
         return <Plug device={device} />;
+      case DeviceType.CAMERA:
+        return <Camera device={device} onOpenModal={props.onOpenModal} />;
     }
     return <></>;
   };

@@ -4,6 +4,7 @@ type TasmotaDeviceDto struct {
 	Status    TasmotaDeviceStatusDto    `json:"Status"`
 	StatusSNS TasmotaDeviceStatusSNSDto `json:"StatusSNS"`
 	StatusNET TasmotaDeviceStatusNETDto `json:"StatusNET"`
+	Type Type 
 }
 
 type TasmotaDeviceStatusDto struct {
@@ -13,10 +14,12 @@ type TasmotaDeviceStatusDto struct {
 
 type TasmotaDeviceStatusSNSDto struct {
 	Energy *TasmotaDeviceEnergyDto `json:"ENERGY"`
+	Temperature *TasmotaDeviceTemperatureDto `json:"AM2301"`
 }
 
 type TasmotaDeviceStatusNETDto struct {
 	HostName string `json:"Hostname"`
+	IPAddress string `json:"IPAddress"`
 }
 
 type TasmotaDeviceEnergyDto struct {
@@ -24,4 +27,9 @@ type TasmotaDeviceEnergyDto struct {
 	Yesterday float32 `json:"Yesterday"`
 	Today     float32 `json:"Today"`
 	Power     float32 `json:"Power"`
+}
+
+type TasmotaDeviceTemperatureDto struct {
+	Temperature float32 `json:"Temperature"`
+	Humidity float32 `json:"Humidity"`
 }

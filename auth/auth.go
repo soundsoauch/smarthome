@@ -9,7 +9,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"smarthome/interfaces"
 	"unicode/utf16"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Session struct {
@@ -123,4 +126,20 @@ func preparePassword(challenge, password string) string {
 	hasher.Write(b)
 	hash := hasher.Sum(nil)
 	return hex.EncodeToString(hash)
+}
+
+func Authenticator(config *interfaces.Config) gin.HandlerFunc {
+	var session *Session = New(config.Fritzbox.Host, config.Fritzbox.User, config.Fritzbox.Password)
+
+	return func(c *gin.Context) {
+		var sid, err = session.GetSID()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.Set("sid", sid)
+		c.Next()
+	}
 }

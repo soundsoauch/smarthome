@@ -11,7 +11,9 @@ type Props = {
 
 export const Sensor: React.FC<Props> = (props: Props) => {
   return (
-    <section className="tile tile-type-sensor">
+    <section
+      className={`tile tile-type-sensor tile-state-${props.device.state.alert}`}
+    >
       <h2>{props.device.name}</h2>
       <div className="tile-body">
         {props.device.state.alert === AlertState.OPEN ? (

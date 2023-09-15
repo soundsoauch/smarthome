@@ -1,6 +1,7 @@
 export interface Device {
   name: string;
   id: string;
+  ip?: string;
   isConnected: boolean;
   type?: DeviceType;
   lowBattery?: boolean;
@@ -38,6 +39,7 @@ export enum DeviceType {
   PLUG = "PLUG",
   THERMOMETER = "THERMOMETER",
   BUTTON = "BUTTON",
+  CAMERA = "CAMERA",
   UNKNOWN = "UNKNOWN",
 }
 

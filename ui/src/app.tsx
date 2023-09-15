@@ -49,6 +49,7 @@ export default function App() {
         return device;
       })
     );
+    setModal(null);
   };
 
   return (

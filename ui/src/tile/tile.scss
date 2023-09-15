@@ -18,7 +18,7 @@
     padding: 4px;
 
     > div {
-      font-size: 1rem;
+      font-size: 5vw;
 
       .title-unit {
         display: inline-flex;
@@ -40,7 +40,19 @@
     }
   }
 
+  &.tile-state-OPEN {
+    background-color: #f7d89e;
+
+    svg {
+      color: #7c4545;
+    }
+  }
+
   &.tile-state-ON {
-    background-color: #fbe7c6;
+    background-color: #f5f5a9;
+
+    svg {
+      color: #bebe00;
+    }
   }
 }

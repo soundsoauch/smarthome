@@ -10,8 +10,8 @@ import (
 )
 
 
-func GetTasmotaState(hostname string, ch chan<- *interfaces.TasmotaDeviceDto) {
-	resp, err := http.Get("http://" + hostname + "/cm?cmnd=Status%200")
+func GetTasmotaState(tasmotaDeviceConfig TasmotaDeviceConfig, ch chan<- *interfaces.TasmotaDeviceDto) {
+	resp, err := http.Get("http://" + tasmotaDeviceConfig.hostName + "/cm?cmnd=Status%200")
 	if err != nil {
 		ch <- nil
 		return
@@ -30,6 +30,8 @@ func GetTasmotaState(hostname string, ch chan<- *interfaces.TasmotaDeviceDto) {
 		ch <- nil
 		return
 	}
+
+	switchBody.Type = tasmotaDeviceConfig.deviceType
 
 	ch <- switchBody
 }
@@ -65,19 +67,19 @@ func SetTasmotaState(hostname string, deviceState *interfaces.DeviceStateDto) er
 }
 
 
-func GetTasmotaDevices(hostnames []string) ([]*interfaces.Device, error) {
+func GetTasmotaDevices(tasmotaDeviceConfigs []TasmotaDeviceConfig) ([]*interfaces.Device, error) {
 	var ch chan *interfaces.TasmotaDeviceDto = make(chan *interfaces.TasmotaDeviceDto)
 	var results []*interfaces.Device
 
-	for _, hostname := range hostnames {
-		go GetTasmotaState(hostname, ch)
+	for _, tasmotaDeviceConfig := range tasmotaDeviceConfigs {
+		go GetTasmotaState(tasmotaDeviceConfig, ch)
 	}
 	for {
 		var tasmotaDevice *devices.TasmotaDevice = devices.NewTasmotaDevice(<-ch)
 
 		results = append(results, tasmotaDevice.GetDevice())
 
-		if len(results) == len(hostnames) {
+		if len(results) == len(tasmotaDeviceConfigs) {
 			break
 		}
 	}

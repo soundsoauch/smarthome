@@ -1,13 +1,10 @@
-$modalHeight: 400px;
-
 .modal {
   display: block;
   position: absolute;
-  top: calc(50% - $modalHeight/2);
-  left: 10%;
-  right: 10%;
-  height: $modalHeight;
-  padding: 8px;
+  top: 10vh;
+  left: 5vw;
+  right: 5vw;
+  padding: 8px 8px 45px 8px;
   background-color: #ffffff;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px;
 
@@ -17,18 +14,53 @@ $modalHeight: 400px;
   }
 
   form {
-    > div {
-      display: flex;
+    > span {
+      display: block;
+      margin: 1rem 0;
+    }
+
+    .radio-group {
+      display: grid;
+      grid-template-columns: repeat(2, 50%);
+      grid-template-rows: repeat(2, 50%);
+
+      > div {
+        display: flex;
+      }
+
+      input {
+        margin-top: 6px;
+
+        &:not(.disabled) {
+          cursor: pointer;
+        }
+      }
+
+      label {
+        padding: 4px 0.5rem;
+        margin: 0 1rem 0 0;
+
+        &:not(.disabled) {
+          cursor: pointer;
+        }
+      }
     }
 
     label {
-      width: 30%;
-      font-weight: normal;
+      display: block;
       font-size: 0.8rem;
+      margin-bottom: 1rem;
     }
 
     #tSoll {
-      flex-grow: 1;
+      width: 100%;
+    }
+
+    #submit-button {
+      padding: 0.5rem 1rem;
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
     }
   }
 }
