@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"smarthome/interfaces"
 )
 
@@ -29,14 +28,17 @@ func NewRepository(config *interfaces.Config) *Repository {
 func(r *Repository) GetDevices(sid string) ([]*interfaces.Device, error) {
 	fritzDevices, fritzErr := GetFritzDevices(sid)
 	tasmotaDevices, tasmotaErr := GetTasmotaDevices(r.tasmotaDeviceConfigs)
-	
-	if fritzErr != nil || tasmotaErr  != nil{
-		return nil, errors.New(fritzErr.Error() + ", " + tasmotaErr.Error())
-	}
-
 	var devices []*interfaces.Device
+
+	if fritzErr != nil {
+		return nil, fritzErr
+	}
 	for _, fritzDevice := range fritzDevices {
 		devices = append(devices, fritzDevice)
+	}
+	
+	if tasmotaErr != nil {
+		return nil, tasmotaErr
 	}
 	for _, tasmotaDevice := range tasmotaDevices {
 		devices = append(devices, tasmotaDevice)

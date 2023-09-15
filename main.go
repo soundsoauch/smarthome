@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"os"
 	"os/exec"
 	"smarthome/auth"
 	"smarthome/interfaces"
@@ -14,54 +16,76 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/go-ping/ping"
+	"github.com/joho/godotenv"
+	"github.com/mdlayher/wol"
 	"gopkg.in/yaml.v2"
 )
 
-func main() {
-	var r *gin.Engine = gin.New()
+func getConfig() (*interfaces.Config, error) {
 	yamlFile, err := ioutil.ReadFile("config.yaml")
     if err != nil {
-        fmt.Printf("Config YAML err: %v ", err)
-		return
+        return nil, fmt.Errorf("Config YAML err: %v ", err)
     }
 	var config *interfaces.Config
     err = yaml.Unmarshal(yamlFile, &config)
     if err != nil {
-        fmt.Printf("Config YAML err: %v ", err)
-		return
+        return nil, fmt.Errorf("Config YAML err: %v ", err)
     }
-/*
-	var inet, netErr = net.InterfaceByName("eth0")
-	if netErr != nil {
-		fmt.Println(netErr)
+
+	return config, nil
+}
+
+func init()  {
+	var err error = godotenv.Load(".env")
+
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+}
+
+func main() {
+	var ginMode string = os.Getenv("GIN_MODE") 
+ 	gin.SetMode(ginMode) 
+	var r *gin.Engine = gin.New()
+	var config, configErr = getConfig()
+	if configErr != nil {
+		fmt.Println(configErr)
 		return
 	}
 
-	var client, wolErr = wol.NewRawClient(inet)
-	if wolErr != nil {
-		fmt.Println(wolErr)
-		return
+	if (ginMode == "release") {
+		var inet, netErr = net.InterfaceByName(config.Iris.Interface)
+		if netErr != nil {
+			fmt.Println(netErr)
+			return
+		}
+	
+		var client, wolErr = wol.NewRawClient(inet)
+		if wolErr != nil {
+			fmt.Println(wolErr)
+			return
+		}
+	
+		var target, macErr = net.ParseMAC(config.Iris.Mac)
+		if macErr != nil {
+			fmt.Println(macErr)
+			return
+		}
+
+		r.GET("/startup", func(c *gin.Context) {
+			c.JSON(http.StatusOK, client.Wake(target))
+		})
 	}
-
-	var target, macErr = net.ParseMAC("A8:A1:59:19:0E:A4")
-	if macErr != nil {
-		fmt.Println(macErr)
-		return
-	}*/
-
+	
 	var deviceRepository *repository.Repository = repository.NewRepository(config)
 
-	r.GET("/startup", func(c *gin.Context) {
-	//	c.JSON(http.StatusOK, client.Wake(target))
-	})
-
 	r.GET("/shutdown", func(c *gin.Context) {
-		var shutdownCmd = exec.Command("ssh", "shutdown@iris", "sudo systemctl poweroff")
+		var shutdownCmd = exec.Command("ssh", config.Iris.User + "@" + config.Iris.Host, "sudo systemctl poweroff")
 		c.JSON(http.StatusOK, shutdownCmd.Start())
 	})
 
 	r.GET("/status", func(c *gin.Context) {
-		var pinger *ping.Pinger = ping.New("iris")
+		var pinger *ping.Pinger = ping.New(config.Iris.Host)
 		var counter uint8 = 1
 		var available bool = false
 

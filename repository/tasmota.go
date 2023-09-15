@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"smarthome/devices"
 	"smarthome/interfaces"
+	"sort"
+
+	"golang.org/x/exp/slices"
 )
 
 
@@ -70,8 +73,10 @@ func SetTasmotaState(hostname string, deviceState *interfaces.DeviceStateDto) er
 func GetTasmotaDevices(tasmotaDeviceConfigs []TasmotaDeviceConfig) ([]*interfaces.Device, error) {
 	var ch chan *interfaces.TasmotaDeviceDto = make(chan *interfaces.TasmotaDeviceDto)
 	var results []*interfaces.Device
+	var hostNames []string
 
 	for _, tasmotaDeviceConfig := range tasmotaDeviceConfigs {
+		hostNames = append(hostNames, tasmotaDeviceConfig.hostName)
 		go GetTasmotaState(tasmotaDeviceConfig, ch)
 	}
 	for {
@@ -83,6 +88,12 @@ func GetTasmotaDevices(tasmotaDeviceConfigs []TasmotaDeviceConfig) ([]*interface
 			break
 		}
 	}
+
+	sort.Slice(results, func(i int, j int) bool {
+		a := slices.Index(hostNames, results[i].ID)
+		b := slices.Index(hostNames, results[j].ID)
+		return a < b
+	})
 
 	return results, nil
 }
